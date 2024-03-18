@@ -2,5 +2,6 @@
 
 Use web crawling technology to gather information, then organize the text into a txt file with key words included.
 
-![Clip_2024-03-18_20-22-02](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/c950a5bb-2a14-4a1f-80c4-2f72ba82b1cd)
-![Clip_2024-03-18_20-23-20](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/460dcc66-f0f5-48ac-ae31-ceaea2b3c8b9)
+![Clip_2024-03-18_21-05-14](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/d5556757-3fc6-4d85-8cbc-df807d67fdd1)
+![Clip_2024-03-18_21-05-41](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/d22f3be3-d115-4d11-92ad-7c246bd2c567)
+![Clip_2024-03-18_21-07-02](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/d9e46ff4-188a-42ae-ac09-dba837455297)
