@@ -5,8 +5,9 @@ import time
 import os
 import logging
 import re
+import pyperclip
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QVBoxLayout, QHBoxLayout, QMessageBox, QFileDialog, QListWidget, QComboBox
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QPalette, QColor
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
 # 配置日志记录
@@ -62,14 +63,20 @@ class ScrapingThread(QThread):
                 results.append((title, date, url, ""))
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            # 并发爬取所有网页的文字内容
-            text_results = list(executor.map(self.scrape_page, [url for _, _, url, _ in results]))
+            # 并发爬取所有网页的文字内容和链接
+            page_results = list(executor.map(self.scrape_page, [url for _, _, url, _ in results]))
+            text_results = [result[0] for result in page_results]
+            link_results = [result[1] for result in page_results]
+            button_link_results = [result[2] for result in page_results]
 
-        # 将文字内容添加到结果列表中
-        for i, text in enumerate(text_results):
-            results[i] = results[i][:3] + (text,)
+        # 将文字内容、链接和按钮链接添加到结果列表中
+        for i, (text, links, button_links) in enumerate(zip(text_results, link_results, button_link_results)):
+            results[i] = results[i][:3] + (text, links, button_links)
 
         file_path, words, chars_without_spaces, chars_with_spaces, non_chinese_words = self.save_results(self.keyword, results)
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+            pyperclip.copy(content)  # 自动复制文本内容到剪贴板
         self.finished_signal.emit(file_path, words, chars_without_spaces, chars_with_spaces, non_chinese_words)
 
     def scrape_page(self, url, retry_count=3):
@@ -79,16 +86,31 @@ class ScrapingThread(QThread):
             try:
                 response = requests.get(url, headers=HEADERS, timeout=30)
                 response.raise_for_status()
+                response.encoding = response.apparent_encoding  # 检测并转换编码
                 soup = BeautifulSoup(response.text, 'html.parser')
                 paragraphs = soup.find_all('p')
                 text = '\n'.join([p.get_text(strip=True) for p in paragraphs])
-                return text
+                
+                # 提取网页中的链接
+                links = [link.get('href') for link in soup.find_all('a')]
+                links = [link for link in links if link and (link.startswith('http') or link.startswith('www'))]
+                
+                # 提取网页中的按钮名称和链接
+                button_links = []
+                for button in soup.find_all(['button', 'input']):
+                    if button.get('type') == 'submit' or button.get('type') == 'button':
+                        button_name = button.get('value') or button.get_text(strip=True)
+                        button_link = button.get('onclick') or button.get('formaction') or button.get('href')
+                        if button_name and button_link:
+                            button_links.append(f"<{button_name}>{button_link}")
+                
+                return text, links, button_links
             except requests.exceptions.RequestException as e:
                 logging.warning(f"请求失败 (尝试 {attempt+1}/{retry_count}): {url}")
                 logging.warning(f"错误信息: {e}")
                 time.sleep(1)  # 等待一段时间后重试
         logging.error(f"请求失败,已达到最大重试次数: {url}")
-        return ""
+        return "", [], []
 
     def save_results(self, keyword, results):
         directory = self.directory or os.path.expanduser("~/Downloads")
@@ -112,11 +134,13 @@ class ScrapingThread(QThread):
             file.write("如果在搜索结果中找不到足够的信息,不确定答案,尽最大努力通过使用来自搜索结果的所有信息给出有帮助的回应。记住要用简体中文回答。\n\n")
             file.write("Search results:\n")
             file.write('"""\n')
-            for i, (title, date, url, text) in enumerate(results, start=1):
+            for i, (title, date, url, text, links, button_links) in enumerate(results, start=1):
                 file.write(f"NUMBER:{i}\n")
                 file.write(f"URL: {url}\n")
                 file.write(f"TITLE: {title}\n")
-                file.write(f"CONTENT: {text}\n\n")
+                file.write(f"CONTENT: {text}\n")
+                file.write(f"LINKS: {', '.join(links)}\n")
+                file.write(f"BUTTON_LINKS: {', '.join(button_links)}\n\n")
             file.write('"""\n')
 
         with open(file_path, "r", encoding="utf-8") as file:
@@ -158,6 +182,10 @@ class WebScraperGUI(QWidget):
         num_pages_layout = QHBoxLayout()
         num_pages_label = QLabel("爬取页数:", self)
         self.num_pages_entry = QLineEdit(self)
+        self.num_pages_entry.setPlaceholderText("默认为10")
+        palette = QPalette()
+        palette.setColor(QPalette.PlaceholderText, QColor(128, 128, 128))  # 设置占位符文本颜色为浅灰色
+        self.num_pages_entry.setPalette(palette)
         num_pages_layout.addWidget(num_pages_label)
         num_pages_layout.addWidget(self.num_pages_entry)
         left_layout.addLayout(num_pages_layout)
@@ -225,7 +253,7 @@ class WebScraperGUI(QWidget):
 
     def start_scraping(self):
         keyword = self.keyword_entry.text()
-        num_pages = int(self.num_pages_entry.text())
+        num_pages = int(self.num_pages_entry.text() or "10")  # 默认为10
         search_engine = self.search_engine_combo.currentText()
         directory = self.directory_entry.text()
 
@@ -296,7 +324,9 @@ class WebScraperGUI(QWidget):
         if self.file_list.currentItem():
             directory = self.directory_entry.text() or os.path.expanduser("~/Downloads")
             file_path = os.path.join(directory, self.file_list.currentItem().text())
-            os.startfile(file_path)
+            with open(file_path, "r", encoding="utf-8") as file:
+                content = file.read()
+            pyperclip.copy(content)
 
     def delete_file(self):
         if self.file_list.currentItem():
