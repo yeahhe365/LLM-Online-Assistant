@@ -105,7 +105,6 @@
 
 ---
 
-**开发者团队**
 
 ![bili_poster-1710767370398](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/1f0b2e66-3170-441d-845c-2841c93b1a8c)
 【从何开始123的个人空间-哔哩哔哩】 https://b23.tv/CEUb1Nk
