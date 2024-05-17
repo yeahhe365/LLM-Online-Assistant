@@ -47,6 +47,8 @@ class ScrapingThread(QThread):
     def run(self):
         all_results = []
         for keyword in self.keywords:
+            if self._stop_event:
+                break
             results = self.scrape_keyword(keyword)
             all_results.extend(results)
 
@@ -241,11 +243,11 @@ class WebScraperGUI(QWidget):
         self.keywords_count_label = QLabel("关键词数量: 1", self)
 
         keyword_plus_layout = QHBoxLayout()
+        keyword_plus_layout.addWidget(self.keywords_count_label)
         keyword_plus_label = QLabel("关键词:", self)
         keyword_plus_layout.addWidget(keyword_plus_label)
         keyword_plus_layout.addWidget(self.add_keyword_button)
         keyword_plus_layout.addWidget(self.remove_keyword_button)
-        keyword_plus_layout.addWidget(self.keywords_count_label)
         left_layout.addLayout(keyword_plus_layout)
         left_layout.addLayout(self.keywords_layout)
         self.add_keyword_entry()  # 添加第一个关键词输入框
@@ -390,7 +392,6 @@ class WebScraperGUI(QWidget):
     def start_scraping(self):
         keywords = [entry.text() for entry in self.keyword_entries if entry.text().strip()]
         if not keywords:
-            QMessageBox.warning(self, "无关键词", "请至少输入一个关键词。")
             QMessageBox.warning(self, "无关键词", "请至少输入一个关键词。")
             return
 
