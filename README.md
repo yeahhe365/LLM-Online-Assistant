@@ -1,7 +1,10 @@
-![Clip_2024-05-12_16-36-28](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/afa79e7f-e615-4394-8939-732318e04623)
-![Clip_2024-05-12_16-39-02](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/4f1b75a9-8e74-457b-afb7-f0e922199e07)
-![Clip_2024-05-12_16-41-03](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/687ffe2d-16dc-4f69-ba98-4f07fb934ad6)
-![Clip_2024-05-12_16-46-35](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/267f32d4-c2e4-4ec6-ad91-017d0b491fee)
+![PixPin_2024-05-20_15-36-11](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/27c0d2ba-bfb4-46b1-be3f-d92d9ec82556)
+![PixPin_2024-05-20_15-36-19](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/8e688a83-d29d-44a2-bc18-8ad6603bbf0e)
+![Clip_2024-05-20_15-37-12](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/296e3d90-2655-4afc-af31-71b88bd2c43e)
+![Clip_2024-05-20_15-37-26](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/7b40b3d7-a0d9-43f4-856b-949efbf943c5)
+![image](https://github.com/yeahhe365/LLM-Online-Assistant/assets/64304674/edfb41aa-a3c5-49b0-b08b-04aaac251bea)
+
+
 
 ## 使用说明书
 
